@@ -18,7 +18,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
         });
 
         // Obtenemos la lista de rutas
-        $http.get('http://localhost:8080/autotracks/resources/rutas').success(function(data) {
+        $http.get('http://209.208.108.214:8080/autotracks/resources/rutas').success(function(data) {
             $scope.rutas = data;
         });
 
@@ -33,7 +33,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
          */
         var obtenerLocalizaciones = function() {
             var id = $scope.rutaSeleccionada.id
-            $http.get('http://localhost:8080/autotracks/resources/rutas/' + id + '/localizaciones').success(function(data) {
+            $http.get('http://209.208.108.214:8080/autotracks/resources/rutas/' + id + '/localizaciones').success(function(data) {
                 $scope.localizaciones = data;
                 eliminarTrayectos();
                 dibujarTrayectoOriginal();
