@@ -1,0 +1,29 @@
+
+html, body, .row, .content, .sidebar, .main, #map { 
+    height: 100%; 
+    margin: 0px;
+    padding: 0px; 
+}
+
+body {
+    padding-top: 50px;
+}
+
+.sidebar {
+    background-color: #f5f5f5;
+    padding-top: 20px;
+}
+
+.nav-sidebar > li > a {
+    color: #189062;
+    padding-left: 40px;
+}
+
+.nav-sidebar > .active > a {
+    color: #ffffff;
+    background-color: #008452;
+}
+
+.nav-sidebar > .active > a:hover {
+    background-color: #189062;
+}
