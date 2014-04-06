@@ -53,6 +53,21 @@ public class CandidateNode {
         }
         return false;
     }
+    
+    /**
+     * Método para encontrar el vértice más cercano al punto
+     * @param idVertex1 id del vértice 1
+     * @param idVertex2 id del vértice 2
+     * @param vertex1 localización del vértice 1
+     * @param vertex2 localización del vértice 2
+     */
+    public void findClosestVertex(String idVertex1, String idVertex2, Localizacion vertex1, Localizacion vertex2) {
+        if (LocationUtils.distance(nodeLocation, vertex1) < LocationUtils.distance(nodeLocation, vertex2)) {
+            this.wayID = idVertex1;
+        } else {
+            this.wayID = idVertex2;
+        }
+    }
 
     public double getLatitude() {
         return this.nodeLatitude;
