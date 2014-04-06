@@ -1,6 +1,14 @@
 package py.com.fpuna.autotracks.matching;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 
 import py.com.fpuna.autotracks.model.Localizacion;
 
@@ -10,6 +18,8 @@ import py.com.fpuna.autotracks.model.Localizacion;
  */
 public class STMatching {
 
+    @Resource(mappedName = "java:jboss/datasources/asutracksDS")
+    DataSource ds;
     ArrayList<CandidateNode> relevantNodesList;
     ArrayList<ArrayList<CandidateNode>> previousNodesList = new ArrayList<ArrayList<CandidateNode>>();
     double lastBearing = 0, newBearing = 0, outlierBearing = 0, bearingDifference = 0;
@@ -53,6 +63,17 @@ public class STMatching {
             double highestSpatialResult = 0;
             CandidateNode highestSpatialNode = null;
             int highestSpatialIndex = 0;
+            String sqlCost;
+            Connection conn = null;
+            Statement statement = null;
+            ResultSet resultSet = null;
+
+            try {
+                conn = ds.getConnection();
+                statement = conn.createStatement();
+            } catch (SQLException e) {
+                Logger.getLogger(STMatching.class.getName()).log(Level.SEVERE, "Error al obtener conexión a db", e);
+            }
 
             for (CandidateNode f : previousNodesList.get(previousNodesList.size() - 1)) {
                 for (CandidateNode e : previousNodesList.get(previousNodesList.size() - 2)) {
@@ -72,15 +93,36 @@ public class STMatching {
 
                         //Distance and approximate speed between the two candidate nodes
                         double distanceBetweenTheCandidateNodes = LocationUtils.distance(locationOfThePreviousPoint, locationOfTheNextPoint);
+
+                        if (statement != null) {
+                            sqlCost = "SELECT sum(cost) FROM pgr_dijkstra('SELECT id AS id,source::integer,target::integer,"
+                                    + "km::double precision AS cost FROM asu_2po_4pgr'," + e.wayID + ", " + f.wayID + ", false, false);";
+
+//                            System.out.println(sqlCost);
+                            try {
+                                resultSet = statement.executeQuery(sqlCost);
+                                resultSet.next();
+                                //se multiplica por mil para pasar a metros
+                                distanceBetweenTheCandidateNodes = resultSet.getDouble(1) * 1000;
+                            } catch (SQLException ex) {
+                                Logger.getLogger(STMatching.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                         double meanSpeed = distanceBetweenTheCandidateNodes / (f.getTimestamp() - e.getTimestamp());
 
                         //Computing transmission probability
                         double transmissionProbability = (distanceBetweenRawPoints / distanceBetweenTheCandidateNodes);
-                        f.setTransmissionProbability(e, transmissionProbability);
+                        if (f.equals(e) || LocationUtils.distance(f.nodeLocation, e.nodeLocation) < 10) {
+                            System.out.println("IGUALES!!!");
+                            f.setTransmissionProbability(e, 0.0);
+                        } else {
+                            f.setTransmissionProbability(e, transmissionProbability);
+                        }
 
                         //Always equals 1 because we're moving on one segment max, between the measurements - TO IMPLEMENT moving on multiple segments (sums, etc.)
                         double temporalAnalysisFunctionResult = (f.getMaxSpeed() * meanSpeed) / (f.getMaxSpeed() * meanSpeed);
                         f.setTemporalAnalysisResults(temporalAnalysisFunctionResult);
+                        break;
                     }
                 }
 
@@ -156,6 +198,22 @@ public class STMatching {
                     outlierDetected = true;
                     outlierBearing = LocationUtils.bearing(highestSpatialNode.pastNodesList.get(highestSpatialIndex).getLocation(), highestSpatialNode.getLocation());
                     //OverlayMapViewer.buildRoadSegment(highestSpatialNode.pastNodesList.get(highestSpatialIndex), highestSpatialNode, Color.BLUE);
+                }
+            }
+            
+            //se cierra la conexión con la db
+            if (conn != null) {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(MatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(MatcherThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } /*else if (previousNodesList.size() > 0) {
