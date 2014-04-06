@@ -24,6 +24,7 @@ import py.com.fpuna.autotracks.model.Localizacion;
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 import com.javadocmd.simplelatlng.window.RectangularWindow;
+import javax.inject.Inject;
 
 /**
  *
@@ -37,12 +38,15 @@ public class MatcherThread {
 
     @PersistenceContext
     EntityManager em;
-
+    
+    @Inject
+    STMatching stm;
+    
     double rangeQueryRadius = 150;
     double lonMin, lonMax, latMin, latMax;
     ArrayList<CandidateNode> closeNodesList;
     ArrayList<CandidateNode> relevantNodesList;
-    STMatching stm = new STMatching();
+//    STMatching stm = new STMatching();
 
     /**
      * M�todo que permite ralizar map matching de una lista de puntos
@@ -69,9 +73,9 @@ public class MatcherThread {
                 lonMin = rectangularWindow.getLeftLongitude();
                 lonMax = rectangularWindow.getRightLongitude();
 
-                sqlStartNodes = "SELECT ST_NPoints(st_segmentize(way,5)), name, way, st_x(ST_Transform(ST_PointN(st_segmentize(way,5),generate_series(1, ST_NPoints(st_segmentize(way,5)))),4326)), "
-                        + "st_y(ST_Transform(ST_PointN(st_segmentize(way,5),generate_series(1, ST_NPoints(st_segmentize(way,5)))),4326)),"
-                        + "oneway from planet_osm_line where ST_DWithin(way, ST_Transform(ST_GeomFromText('SRID=4326;POINT(" + localizacion.getLongitud() + " " + localizacion.getLatitud() + ")'), 900913), 120);";
+                sqlStartNodes = "SELECT ST_NPoints(st_segmentize(geom_way,5)), osm_name, st_x(ST_PointN(st_segmentize(geom_way,5),generate_series(1, ST_NPoints(st_segmentize(geom_way,5))))), "
+                        + "st_y(ST_PointN(st_segmentize(geom_way,5),generate_series(1, ST_NPoints(st_segmentize(geom_way,5))))), source, target, x1, y1, x2, y2"
+                        + " from asu_2po_4pgr where ST_DWithin(geom_way, ST_GeomFromText('SRID=4326;POINT(" + localizacion.getLongitud() + " " + localizacion.getLatitud() + ")'), 0.002);";
 
                 rsStartNodes = stStartNodes.executeQuery(sqlStartNodes);
 
@@ -108,11 +112,22 @@ public class MatcherThread {
             while (rsStartNodes.next()) {
 
                 String name = rsStartNodes.getString(2);
-                String way = rsStartNodes.getString(3);
+                String way = rsStartNodes.getString(5);
 
                 //read out the StartNodes Latitudes and Longitudes from the ResultSet
-                Double StartLongitude = Double.parseDouble(rsStartNodes.getString(4));
-                Double StartLatitude = Double.parseDouble(rsStartNodes.getString(5));
+                Double StartLongitude = Double.parseDouble(rsStartNodes.getString(3));
+                Double StartLatitude = Double.parseDouble(rsStartNodes.getString(4));
+                
+                String source = rsStartNodes.getString(5);
+                String target = rsStartNodes.getString(6);
+                
+                Localizacion lSource = new Localizacion();
+                lSource.setLongitud(Double.parseDouble(rsStartNodes.getString(7)));
+                lSource.setLatitud(Double.parseDouble(rsStartNodes.getString(8)));
+                
+                Localizacion lTarget = new Localizacion();
+                lTarget.setLongitud(Double.parseDouble(rsStartNodes.getString(7)));
+                lTarget.setLatitud(Double.parseDouble(rsStartNodes.getString(8)));
 
                 int maxSpeed = 0;
                 /*try{
@@ -126,6 +141,7 @@ public class MatcherThread {
 
                 if (StartLongitude > (lonMin) && StartLongitude < (lonMax)
                         && StartLatitude > (latMin) && StartLatitude < (latMax)) {
+                    newStartCandidate.findClosestVertex(source, target, lSource, lTarget);
                     closeNodesList.add(newStartCandidate);
                 }
             }
