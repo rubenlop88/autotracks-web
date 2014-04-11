@@ -9,7 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import py.com.fpuna.autotracks.model.Localizacion;
-
+import py.com.fpuna.autotracks.model.Resultado;
 import py.com.fpuna.autotracks.model.Ruta;
 import py.com.fpuna.autotracks.service.RutasService;
 
@@ -41,11 +41,12 @@ public class RutasResource {
     }
 
     @POST
-    public void guardarRuta(Ruta ruta) {
+    public Resultado guardarRuta(Ruta ruta) {
         for (Localizacion l : ruta.getLocalizaciones()) {
             l.setRuta(ruta);
         }
         rutasService.guardarRuta(ruta);
+        return new Resultado(true, null);
     }
 
 }
