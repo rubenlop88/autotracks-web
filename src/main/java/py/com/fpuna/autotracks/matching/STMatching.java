@@ -96,7 +96,7 @@ public class STMatching {
 
                         if (statement != null) {
                             sqlCost = "SELECT sum(cost) FROM pgr_dijkstra('SELECT id AS id,source::integer,target::integer,"
-                                    + "km::double precision AS cost FROM asu_2po_4pgr'," + e.wayID + ", " + f.wayID + ", false, false);";
+                                    + "km::double precision AS cost FROM asu_2po_4pgr'," + e.vertexID + ", " + f.vertexID + ", false, false);";
 
 //                            System.out.println(sqlCost);
                             try {

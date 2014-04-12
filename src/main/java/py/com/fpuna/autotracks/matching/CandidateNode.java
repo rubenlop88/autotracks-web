@@ -10,7 +10,7 @@ import py.com.fpuna.autotracks.model.Localizacion;
 
 public class CandidateNode {
 
-    String streetName, wayID;
+    String streetName, wayID, vertexID;
     double nodeLatitude, nodeLongitude;
     Localizacion respondingGPSFix, nodeLocation;
     int maxSpeed;
@@ -63,9 +63,9 @@ public class CandidateNode {
      */
     public void findClosestVertex(String idVertex1, String idVertex2, Localizacion vertex1, Localizacion vertex2) {
         if (LocationUtils.distance(nodeLocation, vertex1) < LocationUtils.distance(nodeLocation, vertex2)) {
-            this.wayID = idVertex1;
+            this.vertexID = idVertex1;
         } else {
-            this.wayID = idVertex2;
+            this.vertexID = idVertex2;
         }
     }
 
