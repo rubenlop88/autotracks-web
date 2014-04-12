@@ -49,7 +49,7 @@ public class MatcherThread {
 //    STMatching stm = new STMatching();
 
     /**
-     * M�todo que permite ralizar map matching de una lista de puntos
+     * Método que permite ralizar map matching de una lista de puntos
      *
      * @param localizaciones
      */
@@ -74,7 +74,7 @@ public class MatcherThread {
                 lonMax = rectangularWindow.getRightLongitude();
 
                 sqlStartNodes = "SELECT ST_NPoints(st_segmentize(geom_way,5)), osm_name, st_x(ST_PointN(st_segmentize(geom_way,5),generate_series(1, ST_NPoints(st_segmentize(geom_way,5))))), "
-                        + "st_y(ST_PointN(st_segmentize(geom_way,5),generate_series(1, ST_NPoints(st_segmentize(geom_way,5))))), source, target, x1, y1, x2, y2"
+                        + "st_y(ST_PointN(st_segmentize(geom_way,5),generate_series(1, ST_NPoints(st_segmentize(geom_way,5))))), source, target, x1, y1, x2, y2, id"
                         + " from asu_2po_4pgr where ST_DWithin(geom_way, ST_GeomFromText('SRID=4326;POINT(" + localizacion.getLongitud() + " " + localizacion.getLatitud() + ")'), 0.002);";
 
                 rsStartNodes = stStartNodes.executeQuery(sqlStartNodes);
@@ -112,7 +112,7 @@ public class MatcherThread {
             while (rsStartNodes.next()) {
 
                 String name = rsStartNodes.getString(2);
-                String way = rsStartNodes.getString(5);
+                String way = rsStartNodes.getString(9);
 
                 //read out the StartNodes Latitudes and Longitudes from the ResultSet
                 Double StartLongitude = Double.parseDouble(rsStartNodes.getString(3));
@@ -128,7 +128,7 @@ public class MatcherThread {
                 Localizacion lTarget = new Localizacion();
                 lTarget.setLongitud(Double.parseDouble(rsStartNodes.getString(7)));
                 lTarget.setLatitud(Double.parseDouble(rsStartNodes.getString(8)));
-
+                
                 int maxSpeed = 0;
                 /*try{
                  if(!rsStartNodes.getString(7).isEmpty())
@@ -185,6 +185,7 @@ public class MatcherThread {
                         loc.setLatitudMatch(cd.getLatitude());
                         loc.setLongitudMatch(cd.getLongitude());
                         loc.setMatched(true);
+                        loc.setWayId(Integer.parseInt(cd.wayID));
                         em.merge(loc);
 
                     } catch (Exception ex) {
