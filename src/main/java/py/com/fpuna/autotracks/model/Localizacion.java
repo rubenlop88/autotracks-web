@@ -59,6 +59,9 @@ public class Localizacion implements Serializable {
     @JoinColumn(name = "RUTA")
     @ManyToOne(optional = true)
     private Ruta ruta;
+    
+    @Column(name = "WAY_ID", nullable = true)
+    private Integer wayId;
 
     public Long getId() {
         return id;
@@ -162,6 +165,14 @@ public class Localizacion implements Serializable {
 
     public void setRuta(Ruta ruta) {
         this.ruta = ruta;
+    }
+
+    public Integer getWayId() {
+        return wayId;
+    }
+
+    public void setWayId(Integer wayId) {
+        this.wayId = wayId;
     }
 
     @Override
