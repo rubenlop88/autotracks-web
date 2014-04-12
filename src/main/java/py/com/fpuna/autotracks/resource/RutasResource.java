@@ -44,6 +44,7 @@ public class RutasResource {
     public Resultado guardarRuta(Ruta ruta) {
         for (Localizacion l : ruta.getLocalizaciones()) {
             l.setRuta(ruta);
+            l.setMatched(false);
         }
         rutasService.guardarRuta(ruta);
         return new Resultado(true, null);
