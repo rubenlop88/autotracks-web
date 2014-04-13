@@ -112,7 +112,7 @@ public class MatcherThread {
             while (rsStartNodes.next()) {
 
                 String name = rsStartNodes.getString(2);
-                String way = rsStartNodes.getString(9);
+                String way = rsStartNodes.getString(11);
 
                 //read out the StartNodes Latitudes and Longitudes from the ResultSet
                 Double StartLongitude = Double.parseDouble(rsStartNodes.getString(3));
@@ -126,8 +126,8 @@ public class MatcherThread {
                 lSource.setLatitud(Double.parseDouble(rsStartNodes.getString(8)));
                 
                 Localizacion lTarget = new Localizacion();
-                lTarget.setLongitud(Double.parseDouble(rsStartNodes.getString(7)));
-                lTarget.setLatitud(Double.parseDouble(rsStartNodes.getString(8)));
+                lTarget.setLongitud(Double.parseDouble(rsStartNodes.getString(9)));
+                lTarget.setLatitud(Double.parseDouble(rsStartNodes.getString(10)));
                 
                 int maxSpeed = 0;
                 /*try{
