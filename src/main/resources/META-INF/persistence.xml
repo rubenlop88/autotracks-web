@@ -5,6 +5,7 @@
 	<persistence-unit name="AutotracksPU"
 		transaction-type="JTA">
 		<jta-data-source>java:/jboss/datasources/asutracksDS</jta-data-source>
+		<class>py.com.fpuna.autotracks.model.Asu2po4pgr</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>
 		</properties>

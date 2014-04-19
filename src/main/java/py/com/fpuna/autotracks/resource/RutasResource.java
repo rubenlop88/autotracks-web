@@ -8,6 +8,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import py.com.fpuna.autotracks.matching2.model.CandidateSet;
+import py.com.fpuna.autotracks.matching2.model.Coordinate;
 import py.com.fpuna.autotracks.model.EstadoCalle;
 import py.com.fpuna.autotracks.model.Localizacion;
 import py.com.fpuna.autotracks.model.Resultado;
@@ -55,6 +57,12 @@ public class RutasResource {
     @Path("/traficos")
     public List<EstadoCalle> obtenerEstadoCalles() {
         return rutasService.obtenerEstadosCalles();
+    }
+
+    @GET
+    @Path("/{id}/points")
+    public List<Coordinate> getCoordinates(@PathParam("id") long id) {
+        return rutasService.obtenerPath(id);
     }
 
 }

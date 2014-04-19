@@ -10,6 +10,12 @@ import py.com.fpuna.autotracks.model.Localizacion;
  */
 public class LocationUtils {
 
+    public static float distance(double lat1, double lon1, double lat2, double lon2) {
+        float[] results = new float[3];
+        computeDistanceAndBearing(lat1, lon1, lat2, lon2, results);
+        return results[0];
+    }
+
     public static float distance(Localizacion loc1, Localizacion loc2) {
         float[] results = new float[3];
         computeDistanceAndBearing(loc1.getLatitud(), loc1.getLongitud(), loc2.getLatitud(), loc2.getLongitud(), results);
@@ -22,8 +28,7 @@ public class LocationUtils {
         return results[1];
     }
 
-    private static void computeDistanceAndBearing(double lat1, double lon1,
-            double lat2, double lon2, float[] results) {
+    private static void computeDistanceAndBearing(double lat1, double lon1, double lat2, double lon2, float[] results) {
         // Based on http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
         // using the "Inverse Formula" (section 4)
 
@@ -122,4 +127,5 @@ public class LocationUtils {
             }
         }
     }
+
 }

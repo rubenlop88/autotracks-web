@@ -1,6 +1,7 @@
 'use strict';
 angular.module('myApp', []).controller('RutasController', ['$scope', '$http', function($scope, $http) {
 
+        var baseUrl = 'http://localhost:8080/autotracks/resources';
         /*
          * INICIALIZACION DE LA APP
          */
@@ -18,7 +19,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
         });
 
         // Obtenemos la lista de rutas
-        $http.get('http://209.208.108.214:8080/autotracks/resources/rutas').success(function(data) {
+        $http.get(baseUrl + '/rutas').success(function(data) {
             $scope.rutas = data;
         });
 
@@ -26,14 +27,37 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
          * METODOS PRIVADOS
          */
 
+        var obtenerRutaMatcheada = function() {
+            var id = $scope.rutaSeleccionada.id;
+            $http.get(baseUrl + '/rutas/' + id + '/points').success(function(data) {
+                $scope.puntosMatcheados = data;
+                eliminarPuntosMatcheados();
+                dibujarPuntosMatcheados();
+            });
+        };
+
+        var eliminarPuntosMatcheados = function() {
+            if ($scope.trayecto3) {
+                $scope.map.removeLayer($scope.trayecto3);
+            }
+        };
+
+        var dibujarPuntosMatcheados = function() {
+            var latlngs = $scope.puntosMatcheados.map(function(l) { 
+                return L.latLng(l.latitude, l.longitude); 
+            });
+            $scope.trayecto3 = L.polyline(latlngs, {color: 'blue'});
+            $scope.map.addLayer($scope.trayecto3);
+        };
+
         /**
          * Obtiene la lista de localizaciones de la ruta seleccionada por el usuario.
          * 
          * @returns {undefined}
          */
         var obtenerLocalizaciones = function() {
-            var id = $scope.rutaSeleccionada.id
-            $http.get('http://209.208.108.214:8080/autotracks/resources/rutas/' + id + '/localizaciones').success(function(data) {
+            var id = $scope.rutaSeleccionada.id;
+            $http.get(baseUrl + '/rutas/' + id + '/localizaciones').success(function(data) {
                 $scope.localizaciones = data;
                 eliminarTrayectos();
                 dibujarTrayectoOriginal();
@@ -41,6 +65,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
                     dibujarTrayectoMatcheado();
                 }
             });
+            obtenerRutaMatcheada();
         };
 
         /**
@@ -68,7 +93,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
                 return L.latLng(l.latitud, l.longitud); 
             });
             $scope.trayecto1 = L.polyline(latlngs, {color: 'red'});
-            $scope.map.addLayer($scope.trayecto1)
+            $scope.map.addLayer($scope.trayecto1);
             $scope.map.fitBounds($scope.trayecto1.getBounds());
         };
 
