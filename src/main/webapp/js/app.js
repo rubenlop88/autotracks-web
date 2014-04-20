@@ -16,6 +16,9 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
             layers: [layer],
             zoom: 13
         });
+        
+        //Creamos el layerGroup para el tráfico
+        $scope.trafico = L.layerGroup();
 
         // Obtenemos la lista de rutas
         $http.get('http://209.208.108.214:8080/autotracks/resources/rutas').success(function(data) {
@@ -40,6 +43,40 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
                 if (tieneTrayectoMatcheado()) {
                     dibujarTrayectoMatcheado();
                 }
+            });
+        };
+        
+        /**
+         * Dibuja el estado del trafico
+         * 
+         * @returns {undefined}
+         */
+        var dibujarTrafico = function () {
+            $http.get('http://209.208.108.214:8080/autotracks/resources/rutas/trafico').success(function(data) {
+                $scope.trafico.eachLayer(function (layer) {
+                    $scope.map.removeLayer(layer);
+                });
+
+                $scope.trafico.clearLayers();
+                var polyline;
+                var color;
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].cantidad > 4) {
+                        color = 'red';
+                    } else if (data[i].cantidad > 3) {
+                        color = 'yellow';
+                    } else {
+                        color = 'green';
+                    }
+
+                    polyline = L.polyline([L.latLng(data[i].y1,data[i].x1),
+                        L.latLng(data[i].y2,data[i].x2)], {color: color});
+                    
+                    console.log('el color es: ' + color);
+                    $scope.trafico.addLayer(polyline);
+                    $scope.map.addLayer(polyline);
+                }
+                //$scope.trafico.addTo($scope.map);
             });
         };
 
@@ -68,7 +105,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
                 return L.latLng(l.latitud, l.longitud); 
             });
             $scope.trayecto1 = L.polyline(latlngs, {color: 'red'});
-            $scope.map.addLayer($scope.trayecto1)
+            $scope.map.addLayer($scope.trayecto1);
             $scope.map.fitBounds($scope.trayecto1.getBounds());
         };
 
