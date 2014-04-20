@@ -40,6 +40,12 @@ public class RutasResource {
         return localizaciones;
     }
 
+    @GET
+    @Path("/trafico")
+    public String obtenerTrafico() {
+        return rutasService.obtenerTrafico();
+    }
+
     @POST
     public Resultado guardarRuta(Ruta ruta) {
         for (Localizacion l : ruta.getLocalizaciones()) {

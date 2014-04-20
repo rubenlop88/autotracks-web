@@ -1,10 +1,20 @@
 package py.com.fpuna.autotracks.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.sql.DataSource;
 
 import py.com.fpuna.autotracks.matching.MatcherThread;
 import py.com.fpuna.autotracks.model.Localizacion;
@@ -15,6 +25,9 @@ public class RutasService {
 
     @Inject
     MatcherThread matcher;
+    
+    @Resource(mappedName = "java:jboss/datasources/asutracksDS")
+    DataSource ds;
 
     @PersistenceContext
     EntityManager em;
@@ -27,10 +40,48 @@ public class RutasService {
         return em.createQuery("SELECT l FROM Localizacion l WHERE l.ruta.id = :id")
                 .setParameter("id", id).getResultList();
     }
+    
+    public String obtenerTrafico() {
+        String retorno = null;
+        Statement statement = null;
+        ResultSet result = null;
+        try {
+            Connection con = ds.getConnection();
+            String query = "SELECT r.osm_name, r.x1, r.y1, r.x2, r.y2,COUNT(l.id) As tot, sum(l.velocidad)"
+                    + "FROM localizacion l, asu_2po_4pgr r where l.way_id = r.id group by r.id;";
+            
+            statement = con.createStatement();
+            
+            result = statement.executeQuery(query);
+            
+            JsonArray jArray = new JsonArray();
+            JsonObject json;
+            
+            while (result.next()) {
+                json = new JsonObject();
+                json.addProperty("nombre", result.getString(1));
+                json.addProperty("x1", result.getDouble(2));
+                json.addProperty("y1", result.getDouble(3));
+                json.addProperty("x2", result.getDouble(4));
+                json.addProperty("y2", result.getDouble(5));
+                json.addProperty("cantidad", result.getLong(6));
+                json.addProperty("kmh", result.getDouble(7) * 3.6 / result.getLong(6));
+                jArray.add(json);
+            }
+            
+            retorno = jArray.toString();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(RutasService.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            Logger.getLogger(RutasService.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return retorno;
+    }
 
     public void guardarRuta(Ruta ruta) {
         em.persist(ruta);
         matcher.matchPoints(ruta.getLocalizaciones());
     }
-
+    
 }
