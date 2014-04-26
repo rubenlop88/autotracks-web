@@ -16,7 +16,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
             layers: [layer],
             zoom: 13
         });
-        
+
         //Creamos el layerGroup para el tráfico
         $scope.trafico = L.layerGroup();
 
@@ -45,18 +45,15 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
                 }
             });
         };
-        
+
         /**
-         * Dibuja el estado del trafico
+         * Dibuja el estado del trafico en base a un mapa de calor
          * 
          * @returns {undefined}
          */
-        var dibujarTrafico = function () {
+        $scope.dibujarTraficoCalor = function() {
+            eliminarTrayectos();
             $http.get('http://209.208.108.214:8080/autotracks/resources/rutas/trafico').success(function(data) {
-                $scope.trafico.eachLayer(function (layer) {
-                    $scope.map.removeLayer(layer);
-                });
-
                 $scope.trafico.clearLayers();
                 var polyline;
                 var color;
@@ -69,23 +66,54 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
                         color = 'green';
                     }
 
-                    polyline = L.polyline([L.latLng(data[i].y1,data[i].x1),
-                        L.latLng(data[i].y2,data[i].x2)], {color: color});
-                    
+                    polyline = L.polyline([L.latLng(data[i].y1, data[i].x1),
+                        L.latLng(data[i].y2, data[i].x2)], {color: color});
+
                     console.log('el color es: ' + color);
                     $scope.trafico.addLayer(polyline);
                     $scope.map.addLayer(polyline);
                 }
-                //$scope.trafico.addTo($scope.map);
+            });
+        };
+
+        /**
+         * Dibuja el estado del trafico en base a la velocidad promedio
+         * 
+         * @returns {undefined}
+         */
+        $scope.dibujarTraficoVelocidad = function() {
+            eliminarTrayectos();
+            $http.get('http://209.208.108.214:8080/autotracks/resources/rutas/trafico').success(function(data) {
+                var polyline;
+                var color;
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].kmh < 20) {
+                        color = 'red';
+                    } else if (data[i].kmh < 40) {
+                        color = 'yellow';
+                    } else {
+                        color = 'green';
+                    }
+
+                    polyline = L.polyline([L.latLng(data[i].y1, data[i].x1),
+                        L.latLng(data[i].y2, data[i].x2)], {color: color});
+
+                    $scope.trafico.addLayer(polyline);
+                    $scope.map.addLayer(polyline);
+                }
             });
         };
 
         /**
          * Eliminar ambos trayectos del mapa, el original y el matcheado.
-         * 
+         * elimina además la información de tráfico
          * @returns {undefined}
          */
         var eliminarTrayectos = function() {
+            $scope.trafico.eachLayer(function(layer) {
+                $scope.map.removeLayer(layer);
+            });
+            $scope.trafico.clearLayers();
             if ($scope.trayecto1) {
                 $scope.map.removeLayer($scope.trayecto1);
             }
@@ -101,8 +129,8 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
          * @returns {undefined}
          */
         var dibujarTrayectoOriginal = function() {
-            var latlngs = $scope.localizaciones.map(function(l) { 
-                return L.latLng(l.latitud, l.longitud); 
+            var latlngs = $scope.localizaciones.map(function(l) {
+                return L.latLng(l.latitud, l.longitud);
             });
             $scope.trayecto1 = L.polyline(latlngs, {color: 'red'});
             $scope.map.addLayer($scope.trayecto1);
