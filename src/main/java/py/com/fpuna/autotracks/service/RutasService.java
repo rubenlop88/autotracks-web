@@ -25,7 +25,7 @@ public class RutasService {
 
     @Inject
     MatcherThread matcher;
-    
+
     @Resource(mappedName = "java:jboss/datasources/asutracksDS")
     DataSource ds;
 
@@ -40,23 +40,25 @@ public class RutasService {
         return em.createQuery("SELECT l FROM Localizacion l WHERE l.ruta.id = :id")
                 .setParameter("id", id).getResultList();
     }
-    
+
     public String obtenerTrafico() {
         String retorno = null;
         Statement statement = null;
         ResultSet result = null;
+        Connection conn = null;
+        
         try {
-            Connection con = ds.getConnection();
+            conn = ds.getConnection();
             String query = "SELECT r.osm_name, r.x1, r.y1, r.x2, r.y2,COUNT(l.id) As tot, sum(l.velocidad)"
                     + "FROM localizacion l, asu_2po_4pgr r where l.way_id = r.id group by r.id;";
-            
-            statement = con.createStatement();
-            
+
+            statement = conn.createStatement();
+
             result = statement.executeQuery(query);
-            
+
             JsonArray jArray = new JsonArray();
             JsonObject json;
-            
+
             while (result.next()) {
                 json = new JsonObject();
                 json.addProperty("nombre", result.getString(1));
@@ -68,13 +70,28 @@ public class RutasService {
                 json.addProperty("kmh", result.getDouble(7) * 3.6 / result.getLong(6));
                 jArray.add(json);
             }
-            
+
             retorno = jArray.toString();
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(RutasService.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
             Logger.getLogger(RutasService.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (conn != null) {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(MatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(MatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
         return retorno;
     }
@@ -83,5 +100,5 @@ public class RutasService {
         em.persist(ruta);
         matcher.matchPoints(ruta.getLocalizaciones());
     }
-    
+
 }
