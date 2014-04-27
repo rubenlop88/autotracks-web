@@ -44,7 +44,7 @@ public class RutasService {
     }
 
     public List<Localizacion> obtenerLocalizaciones(long id) {
-        return em.createQuery("SELECT l FROM Localizacion l WHERE l.ruta.id = :id")
+        return em.createQuery("SELECT l FROM Localizacion l WHERE l.ruta.id = :id ORDER BY l.fecha")
                 .setParameter("id", id).getResultList();
     }
 
