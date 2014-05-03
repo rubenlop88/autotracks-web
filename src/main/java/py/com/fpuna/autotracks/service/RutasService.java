@@ -1,21 +1,11 @@
 package py.com.fpuna.autotracks.service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.sql.DataSource;
 import py.com.fpuna.autotracks.matching.MatcherThread;
 import py.com.fpuna.autotracks.matching2.SpatialTemporalMatching;
 import py.com.fpuna.autotracks.matching2.model.Candidate;
@@ -23,6 +13,7 @@ import py.com.fpuna.autotracks.matching2.model.Coordinate;
 import py.com.fpuna.autotracks.matching2.model.Point;
 import py.com.fpuna.autotracks.model.Localizacion;
 import py.com.fpuna.autotracks.model.Ruta;
+import py.com.fpuna.autotracks.model.Trafico;
 
 @Stateless
 public class RutasService {
@@ -35,9 +26,6 @@ public class RutasService {
 
     @Inject
     SpatialTemporalMatching stm;
-
-    @Resource(mappedName = "java:jboss/datasources/asutracksDS")
-    DataSource ds;
 
     public List<Ruta> obtenerRutas() {
         return em.createQuery("SELECT r FROM Ruta r").getResultList();
@@ -53,59 +41,9 @@ public class RutasService {
         matcher.matchPoints(ruta.getLocalizaciones());
     }
 
-    public String obtenerTrafico() {
-        String retorno = null;
-        Statement statement = null;
-        ResultSet result = null;
-        Connection conn = null;
-        
-        try {
-            conn = ds.getConnection();
-            String query = "SELECT r.osm_name, r.x1, r.y1, r.x2, r.y2,COUNT(l.id) As tot, sum(l.velocidad)"
-                    + "FROM localizacion l, asu_2po_4pgr r where l.way_id = r.id group by r.id;";
-
-            statement = conn.createStatement();
-
-            result = statement.executeQuery(query);
-
-            JsonArray jArray = new JsonArray();
-            JsonObject json;
-
-            while (result.next()) {
-                json = new JsonObject();
-                json.addProperty("nombre", result.getString(1));
-                json.addProperty("x1", result.getDouble(2));
-                json.addProperty("y1", result.getDouble(3));
-                json.addProperty("x2", result.getDouble(4));
-                json.addProperty("y2", result.getDouble(5));
-                json.addProperty("cantidad", result.getLong(6));
-                json.addProperty("kmh", result.getDouble(7) * 3.6 / result.getLong(6));
-                jArray.add(json);
-            }
-
-            retorno = jArray.toString();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(RutasService.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception e) {
-            Logger.getLogger(RutasService.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            if (conn != null) {
-                if (statement != null) {
-                    try {
-                        statement.close();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(MatcherThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(MatcherThread.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        return retorno;
+    public List<Trafico> obtenerTrafico() {
+        return em.createQuery("SELECT new py.com.fpuna.autotracks.model.Trafico(r.name, r.x1, r.y1, r.x2, r.y2, COUNT(l.id), SUM(l.velocidad))"
+                + "FROM Localizacion l, Asu2po4pgr r where l.wayId = r.id group by r.id", Trafico.class).getResultList();
     }
 
     public List<Coordinate> obtenerPath(long id) {

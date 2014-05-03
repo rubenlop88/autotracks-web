@@ -12,6 +12,7 @@ import py.com.fpuna.autotracks.matching2.model.Coordinate;
 import py.com.fpuna.autotracks.model.Localizacion;
 import py.com.fpuna.autotracks.model.Resultado;
 import py.com.fpuna.autotracks.model.Ruta;
+import py.com.fpuna.autotracks.model.Trafico;
 import py.com.fpuna.autotracks.service.RutasService;
 
 @Path("rutas")
@@ -53,7 +54,7 @@ public class RutasResource {
 
     @GET
     @Path("/trafico")
-    public String obtenerTrafico() {
+    public List<Trafico> obtenerTrafico() {
         return rutasService.obtenerTrafico();
     }
 
