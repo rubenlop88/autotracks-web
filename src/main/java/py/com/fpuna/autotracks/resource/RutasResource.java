@@ -1,6 +1,12 @@
 package py.com.fpuna.autotracks.resource;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -8,6 +14,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import py.com.fpuna.autotracks.matching2.model.Coordinate;
 import py.com.fpuna.autotracks.model.Localizacion;
 import py.com.fpuna.autotracks.model.Resultado;
@@ -52,6 +59,24 @@ public class RutasResource {
         return new Resultado(true, null);
     }
 
+    /**
+     * Servicio para obtener el estado del tráfico en un momento dado
+     * @param fecha
+     * @return 
+     */
+    @GET
+    @Path("/traficoFecha")
+    public List<Trafico> obtenerTrafico(@QueryParam("fecha") String fecha) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date fec = new Date();
+        try {
+            fec = sdf.parse(fecha);
+        } catch (ParseException ex) {
+            Logger.getLogger(RutasResource.class.getName()).log(Level.SEVERE, "Error al transformar la fecha", ex);
+        }
+        return rutasService.obtenerTrafico(new Timestamp(fec.getTime()));
+    }
+    
     @GET
     @Path("/trafico")
     public List<Trafico> obtenerTrafico() {
