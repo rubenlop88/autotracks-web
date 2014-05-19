@@ -64,6 +64,22 @@ public class RutasService {
                 + sdf.format(fecha) + "' group by r.id";
         return em.createQuery(query, Trafico.class).getResultList();
     }
+    
+    /**
+     * Permite obtener el estado actual del tráfico en un momento dado
+     * @return 
+     */
+    public List<Trafico> obtenerTraficoActual() {
+        Calendar fin = Calendar.getInstance();
+        Calendar inicio = Calendar.getInstance();
+        //se setea el inicio 30 min antes
+        inicio.setTimeInMillis(fin.getTimeInMillis() - 2 * 60 * 60 * 1000);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String query = "SELECT new py.com.fpuna.autotracks.model.Trafico(r.name, r.x1, r.y1, r.x2, r.y2, COUNT(l.id), SUM(l.velocidad))"
+                + "FROM Localizacion l, Asu2po4pgr r where l.wayId = r.id and l.fecha between '" + sdf.format(inicio.getTime()) + "' and '" 
+                + sdf.format(fin.getTime()) + "' group by r.id";
+        return em.createQuery(query, Trafico.class).getResultList();
+    }
 
     public List<Coordinate> obtenerPath(long id) {
         List<Localizacion> localizacions = obtenerLocalizaciones(id);

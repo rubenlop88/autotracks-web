@@ -80,6 +80,12 @@ public class RutasResource {
     @GET
     @Path("/trafico")
     public List<Trafico> obtenerTrafico() {
+        return rutasService.obtenerTraficoActual();
+    }
+    
+    @GET
+    @Path("/traficoGlobal")
+    public List<Trafico> obtenerTraficoGlobal() {
         return rutasService.obtenerTrafico();
     }
 
