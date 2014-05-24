@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 /**
  *
@@ -30,6 +31,9 @@ public class Ruta implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ruta")
     private List<Localizacion> localizaciones;
+
+    @Transient
+    private Long serverId;
 
     public Ruta() {
     }
@@ -60,6 +64,14 @@ public class Ruta implements Serializable {
 
     public void setLocalizaciones(List<Localizacion> localizaciones) {
         this.localizaciones = localizaciones;
+    }
+
+    public Long getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(Long serverId) {
+        this.serverId = serverId;
     }
 
 }

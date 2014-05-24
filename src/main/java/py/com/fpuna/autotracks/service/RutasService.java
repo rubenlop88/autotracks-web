@@ -36,9 +36,10 @@ public class RutasService {
                 .setParameter("id", id).getResultList();
     }
 
-    public void guardarRuta(Ruta ruta) {
-        em.persist(ruta);
+    public Ruta guardarRuta(Ruta ruta) {
+        em.merge(ruta);
         matcher.matchPoints(ruta.getLocalizaciones());
+        return ruta;
     }
 
     public List<Trafico> obtenerTrafico() {

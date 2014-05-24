@@ -44,12 +44,15 @@ public class RutasResource {
 
     @POST
     public Resultado guardarRuta(Ruta ruta) {
+        if (ruta.getServerId() != null) {
+            ruta.setId(ruta.getServerId());
+        }
         for (Localizacion l : ruta.getLocalizaciones()) {
             l.setRuta(ruta);
             l.setMatched(false);
         }
-        rutasService.guardarRuta(ruta);
-        return new Resultado(true, null);
+        ruta = rutasService.guardarRuta(ruta);
+        return new Resultado(true, null, ruta.getId());
     }
 
     @GET
