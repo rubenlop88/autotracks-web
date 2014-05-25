@@ -40,7 +40,7 @@ public class RutasService {
     }
 
     public Ruta guardarRuta(Ruta ruta) {
-        em.merge(ruta);
+        ruta = em.merge(ruta);
         matcher.matchPoints(ruta.getLocalizaciones());
         return ruta;
     }
@@ -58,6 +58,7 @@ public class RutasService {
     public List<Trafico> obtenerTrafico(Timestamp fecha) {
         Calendar inicio = Calendar.getInstance();
         //se setea el inicio 30 min antes
+        // TODO no es necesario usar concatenacion ni SimpleDateFormat
         inicio.setTimeInMillis(fecha.getTime() - 30 * 60 * 1000);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String query = "SELECT new py.com.fpuna.autotracks.model.Trafico(r.name, r.x1, r.y1, r.x2, r.y2, COUNT(l.id), SUM(l.velocidad))"
@@ -74,6 +75,7 @@ public class RutasService {
         Calendar fin = Calendar.getInstance();
         Calendar inicio = Calendar.getInstance();
         //se setea el inicio 30 min antes
+        // TODO no es necesario usar concatenacion ni SimpleDateFormat
         inicio.setTimeInMillis(fin.getTimeInMillis() - 2 * 60 * 60 * 1000);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String query = "SELECT new py.com.fpuna.autotracks.model.Trafico(r.name, r.x1, r.y1, r.x2, r.y2, COUNT(l.id), SUM(l.velocidad))"

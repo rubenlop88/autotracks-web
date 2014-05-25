@@ -51,13 +51,19 @@ public class RutasResource {
 
     @POST
     public Resultado guardarRuta(Ruta ruta) {
+        // Si la app Android envio un serverId, seteamos este id como el id de
+        // la ruta para agregar a la ruta existentes las localizaciones enviadas
         if (ruta.getServerId() != null) {
             ruta.setId(ruta.getServerId());
         }
+        // Seteamos la ruta en cada localizacion para que se guarde la relacion
+        // en la base de datos
         for (Localizacion l : ruta.getLocalizaciones()) {
             l.setRuta(ruta);
             l.setMatched(false);
         }
+        // Guardamos la ruta y retornamos en el resultado el id de la ruta
+        // guardada para que la app Android pueda reenviarnos el serverId.
         ruta = rutasService.guardarRuta(ruta);
         return new Resultado(true, null, ruta.getId());
     }
