@@ -31,7 +31,7 @@ public class RutasService {
     SpatialTemporalMatching stm;
 
     public List<Ruta> obtenerRutas() {
-        return em.createQuery("SELECT r FROM Ruta r").getResultList();
+        return em.createQuery("SELECT r FROM Ruta r order by r.fecha").getResultList();
     }
 
     public List<Localizacion> obtenerLocalizaciones(long id) {
