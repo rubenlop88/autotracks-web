@@ -62,11 +62,13 @@ public class STMatching {
             //“true�? path from GPS_FIX_i-1 to GPS_FIX_i follows the shortest path from candidate node e to candidate node f
             double highestSpatialResult = 0;
             CandidateNode highestSpatialNode = null;
+            CandidateNode previousNode = null;
             int highestSpatialIndex = 0;
             String sqlCost;
             Connection conn = null;
             Statement statement = null;
             ResultSet resultSet = null;
+            
 
             try {
                 conn = ds.getConnection();
@@ -80,6 +82,7 @@ public class STMatching {
                     //Compute the transmission probability only for the edges connecting the previous correct match and 
                     //the new candidates for current observation
                     if (e.bestMatch == true) {
+                        previousNode = e;
                         //Distance between the GPS fixes
                         double distanceBetweenRawPoints = LocationUtils.distance(e.getParentFix(), f.getParentFix());
 
@@ -112,7 +115,7 @@ public class STMatching {
 
                         //Computing transmission probability
                         double transmissionProbability = (distanceBetweenRawPoints / distanceBetweenTheCandidateNodes);
-                        if (f.equals(e) || LocationUtils.distance(f.nodeLocation, e.nodeLocation) < 10) {
+                        if (f.equals(e) || LocationUtils.distance(f.nodeLocation, e.nodeLocation) < 5) {
                             System.out.println("IGUALES!!!");
                             f.setTransmissionProbability(e, 0.0);
                         } else {
@@ -132,6 +135,12 @@ public class STMatching {
                         highestSpatialResult = e;
                         highestSpatialNode = f;
                         highestSpatialIndex = f.spatialAnalysisFunctionResults.indexOf(e);
+                    } else if (e == highestSpatialResult) {
+                        //En el caso de que coincidan los scores, se prefiere la calle con el mismo nombre que el nodo anterior
+                        if (previousNode != null && previousNode.streetName.trim().equalsIgnoreCase(f.streetName.trim())) {
+                            highestSpatialNode = f;
+                            highestSpatialIndex = f.spatialAnalysisFunctionResults.indexOf(e);
+                        }
                     }
                 }
             }

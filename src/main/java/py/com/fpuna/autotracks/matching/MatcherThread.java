@@ -24,6 +24,8 @@ import py.com.fpuna.autotracks.model.Localizacion;
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 import com.javadocmd.simplelatlng.window.RectangularWindow;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 /**
@@ -54,6 +56,7 @@ public class MatcherThread {
      * @param localizaciones
      */
     @Asynchronous
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void matchPoints(List<Localizacion> localizaciones) {
         String sqlStartNodes;
         Connection conn = null;
@@ -104,6 +107,7 @@ public class MatcherThread {
         }
     }
 
+    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     private void STMatching(ResultSet rsStartNodes, Localizacion localizacion) {
         closeNodesList = new ArrayList<CandidateNode>();
         relevantNodesList = new ArrayList<CandidateNode>();
