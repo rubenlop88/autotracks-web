@@ -137,7 +137,8 @@ public class STMatching {
                         highestSpatialIndex = f.spatialAnalysisFunctionResults.indexOf(e);
                     } else if (e == highestSpatialResult) {
                         //En el caso de que coincidan los scores, se prefiere la calle con el mismo nombre que el nodo anterior
-                        if (previousNode != null && previousNode.streetName.trim().equalsIgnoreCase(f.streetName.trim())) {
+                        if (previousNode != null && previousNode.streetName != null && f.streetName != null
+                                && previousNode.streetName.trim().equalsIgnoreCase(f.streetName.trim())) {
                             highestSpatialNode = f;
                             highestSpatialIndex = f.spatialAnalysisFunctionResults.indexOf(e);
                         }
