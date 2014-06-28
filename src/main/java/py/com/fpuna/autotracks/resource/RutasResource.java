@@ -15,7 +15,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import py.com.fpuna.autotracks.matching2.model.Coordinate;
 import py.com.fpuna.autotracks.model.Localizacion;
 import py.com.fpuna.autotracks.model.Resultado;
 import py.com.fpuna.autotracks.model.Ruta;
@@ -96,12 +95,6 @@ public class RutasResource {
     @Path("/traficoGlobal")
     public List<Trafico> obtenerTraficoGlobal() {
         return rutasService.obtenerTrafico();
-    }
-
-    @GET
-    @Path("/{id}/points")
-    public List<Coordinate> getCoordinates(@PathParam("id") long id) {
-        return rutasService.obtenerPath(id);
     }
 
 }

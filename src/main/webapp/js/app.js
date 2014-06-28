@@ -31,29 +31,6 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
          * METODOS PRIVADOS
          */
 
-        var obtenerRutaMatcheada = function() {
-            var id = $scope.rutaSeleccionada.id;
-            $http.get(baseUrl + '/rutas/' + id + '/points').success(function(data) {
-                $scope.puntosMatcheados = data;
-                eliminarPuntosMatcheados();
-                dibujarPuntosMatcheados();
-            });
-        };
-
-        var eliminarPuntosMatcheados = function() {
-            if ($scope.trayecto3) {
-                $scope.map.removeLayer($scope.trayecto3);
-            }
-        };
-
-        var dibujarPuntosMatcheados = function() {
-            var latlngs = $scope.puntosMatcheados.map(function(l) { 
-                return L.latLng(l.latitude, l.longitude); 
-            });
-            $scope.trayecto3 = L.polyline(latlngs, {color: 'blue'});
-            $scope.map.addLayer($scope.trayecto3);
-        };
-
         /**
          * Dibuja el estado del trafico en base a un mapa de calor
          * 
@@ -127,7 +104,6 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
                     dibujarTrayectoMatcheado();
                 }
             });
-            obtenerRutaMatcheada();
         };
 
         /**
