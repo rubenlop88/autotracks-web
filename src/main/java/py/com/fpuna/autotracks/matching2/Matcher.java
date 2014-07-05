@@ -32,6 +32,8 @@ public class Matcher {
             Candidate c = results.get(i);
             l.setLatitudMatch(c.getLatitude());
             l.setLongitudMatch(c.getLongitude());
+            l.setMatched(Boolean.TRUE);
+            l.setWayId(c.getEdge().getId());
             em.merge(l);
         }
     }
