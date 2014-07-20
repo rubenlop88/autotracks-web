@@ -25,6 +25,12 @@ public class RutasService {
     public List<Ruta> obtenerRutas() {
         return em.createQuery("SELECT r FROM Ruta r order by r.fecha").getResultList();
     }
+    
+    public List<Ruta> obtenerRutas(Timestamp inicio, Timestamp fin) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return em.createQuery("SELECT r FROM Ruta r where r.fecha between '" + sdf.format(inicio) + "' AND '"
+                + sdf.format(fin) + "' order by r.fecha").getResultList();
+    }
 
     public List<Localizacion> obtenerLocalizaciones(long id) {
         return em.createQuery("SELECT l FROM Localizacion l WHERE l.ruta.id = :id ORDER BY l.fecha")

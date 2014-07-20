@@ -37,6 +37,33 @@ public class RutasResource {
         }
         return rutas;
     }
+    
+    @GET
+    @Path("/fecha")
+    public List<Ruta> obtenerRutasFecha(@QueryParam("inicio") String inicio, 
+            @QueryParam("fin") String fin) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date fechaIni = new Date();
+        Date fechaFin = new Date();
+        
+        try {
+            fechaIni = sdf.parse(inicio);
+            fechaFin = sdf.parse(fin);
+        } catch (ParseException ex) {
+            Logger.getLogger(RutasResource.class.getName()).log(Level.SEVERE, "Error al transformar la fecha", ex);
+        }
+        
+        Logger.getLogger(RutasResource.class.getName()).log(Level.INFO, "inicio: {0} fin: {1}", 
+                new Object[]{sdf.format(fechaIni), sdf.format(fechaFin)});
+        
+        List<Ruta> rutas = rutasService.obtenerRutas(new Timestamp(fechaIni.getTime()),
+                new Timestamp(fechaFin.getTime()));
+        
+        for (Ruta ruta : rutas) {
+            ruta.setLocalizaciones(null);
+        }
+        return rutas;
+    }
 
     @GET
     @Path("/{id}/localizaciones")
