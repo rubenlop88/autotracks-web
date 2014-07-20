@@ -22,18 +22,7 @@
         </div>
         <div class="container-fluid content">
             <div class="row">
-                <div class="col-md-2 sidebar" >
-                    <ul class="nav nav-sidebar">
-                        <li><a ng-click="dibujarTraficoCalor()">Tráfico: Mapa de calor</a></li>
-                        <li><a ng-click="dibujarTraficoVelocidad()">Tráfico: velocidad</a></li>
-                        <li ng-repeat="ruta in rutas" ng-class="{ active : isActive(ruta) }">
-                            <a ng-click="seleccionar(ruta)">
-                                {{ ruta.fecha | date:'dd/MM/yyyy HH:mm:ss' }}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-10 main">
+                <div class="col-md-12 main">
                     <div id="map"></div>
                 </div>
             </div>

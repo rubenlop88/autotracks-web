@@ -23,9 +23,9 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
         $scope.trafico = L.layerGroup();
 
         // Obtenemos la lista de rutas
-        $http.get(baseUrl + '/rutas').success(function(data) {
-            $scope.rutas = data;
-        });
+//        $http.get(baseUrl + '/rutas').success(function(data) {
+//            $scope.rutas = data;
+//        });
 
         /*
          * METODOS PRIVADOS
@@ -191,5 +191,7 @@ angular.module('myApp', []).controller('RutasController', ['$scope', '$http', fu
             $scope.rutaSeleccionada = ruta;
             obtenerLocalizaciones();
         };
+        
+        $scope.dibujarTraficoVelocidad();
 
     }]);
