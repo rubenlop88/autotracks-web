@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html ng-app="trafico">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>AutoTracks: Tráfico</title>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/app.css">
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+        <script src="js/angular.js"></script>
+        <script src="js/trafico.js"></script>
+    </head>
+    <body ng-controller="TraficoController">
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">AutoTracks</a>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid content">
+            <div class="row">
+                <div class="col-md-2 sidebar" >
+                    <h4>Fecha</h4>
+                    <div class="container">
+                        <div class="row">
+                            <div class='col-sm-3'>
+                                <div class="input-group">
+                                    <span class="input-group-addon">fecha</span>
+                                    <input type="text" class="form-control" id="fecha">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="buscar" type="button" class="btn btn-default btn-lg" ng-click="dibujarTraficoVelocidad()">
+                        <span class="glyphicon glyphicon-search"></span> Star
+                    </button>
+                </div>
+                <div class="col-md-10 main">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>   
+    </body>
+</html>
