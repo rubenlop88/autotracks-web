@@ -92,7 +92,7 @@ public class RutasService {
         Calendar fin = Calendar.getInstance();
         Calendar inicio = Calendar.getInstance();
         //se setea el inicio 30 min antes
-        inicio.setTimeInMillis(fin.getTimeInMillis() - DOS_HORAS);
+        inicio.setTimeInMillis(fin.getTimeInMillis() - UNA_HORA);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String query = "SELECT new py.com.fpuna.autotracks.model.Trafico(r.name, r.x1, r.y1, r.x2, r.y2, COUNT(l.id), SUM(l.velocidad))"
                 + "FROM Localizacion l, Asu2po4pgr r where l.wayId = r.id and l.fecha between '" + sdf.format(inicio.getTime()) + "' and '" 
