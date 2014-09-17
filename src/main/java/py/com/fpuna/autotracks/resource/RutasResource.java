@@ -112,6 +112,29 @@ public class RutasResource {
         return rutasService.obtenerTrafico(new Timestamp(fec.getTime()));
     }
     
+    /**
+     * Servicio para obtener el tráfico en una fecha dada durante un periodo de tiempo dado
+     * @param fecha fecha
+     * @param minutos tiempo en minutos
+     * @return 
+     */
+    @GET
+    @Path("/traficoFechaTiempo")
+    public List<Trafico> obtenerTraficoTiempo(@QueryParam("fecha") String fecha,
+            @QueryParam("minutos") String minutos) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date fec = new Date();
+        Integer milis = 0;
+        try {
+            //se transforma el tiempo a milisegundos
+            milis = Integer.getInteger(minutos) * 60 * 1000;
+            fec = sdf.parse(fecha);
+        } catch (ParseException ex) {
+            Logger.getLogger(RutasResource.class.getName()).log(Level.SEVERE, "Error al transformar la fecha", ex);
+        }
+        return rutasService.obtenerTrafico(new Timestamp(fec.getTime()), milis);
+    }
+    
     @GET
     @Path("/trafico")
     public List<Trafico> obtenerTrafico() {
