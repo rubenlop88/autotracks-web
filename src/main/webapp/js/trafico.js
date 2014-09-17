@@ -8,8 +8,9 @@ angular.module('trafico', []).controller('TraficoController', ['$scope', '$http'
          */
 
         // Inicializamos el layer de OpenStreetMaps
-        var layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        var layer = L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' +
+                    ' | &copy; <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> tiles'
         });
 
         // Inicializamos el mapa centrado en Asuncion
@@ -63,8 +64,10 @@ angular.module('trafico', []).controller('TraficoController', ['$scope', '$http'
                 var polyline;
                 var color;
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].kmh < 20) {
+                    if (data[i].kmh < 15) {
                         color = 'red';
+                    } else if (data[i].kmh < 30) {
+                        color = 'orange';
                     } else if (data[i].kmh < 40) {
                         color = 'yellow';
                     } else {

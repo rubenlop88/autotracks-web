@@ -8,8 +8,9 @@ angular.module('rutas', []).controller('RutasController', ['$scope', '$http', fu
          */
 
         // Inicializamos el layer de OpenStreetMaps
-        var layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        var layer = L.tileLayer('http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' +
+                    ' | &copy; <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> tiles'
         });
 
         // Inicializamos el mapa centrado en Asuncion
