@@ -2,6 +2,7 @@ package py.com.fpuna.autotracks.matching2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import py.com.fpuna.autotracks.matching2.model.Candidate;
@@ -13,6 +14,7 @@ import py.com.fpuna.autotracks.matching2.model.Vertex;
 public class CandidateSelection {
 
     private static final double DIST = 0.0005;
+    private static final double RELATION_DEGREES_METER = 111159.0;
 
     private static final String SQL = " SELECT "
             + " id, "
@@ -59,7 +61,13 @@ public class CandidateSelection {
         double lon = point.getLongitude();
         double lat = point.getLatitude();
         String geom = "ST_GeomFromText('SRID=4326;POINT(" + lon + " " + lat + ")')";
-        String sql = SQL.replace(":geom", geom).replace(":dist", String.valueOf(DIST));
+        String radius;
+        if (point.getAccuracy() != null && point.getAccuracy() > Float.valueOf("0")) {
+            radius = getAcuracyInDegrees(point.getAccuracy() * Float.valueOf("1.2"));
+        } else {
+            radius = String.valueOf(DIST);
+        }
+        String sql = SQL.replace(":geom", geom).replace(":dist", radius);
         List<?> result = em.createNativeQuery(sql).getResultList();
         return result;
     }
@@ -94,6 +102,12 @@ public class CandidateSelection {
         candidateSet.setCandidates(candidates);
         candidateSet.setPoint(point);
         return candidateSet;
+    }
+    
+    private String getAcuracyInDegrees(Float accuracy) {
+        double degrees = accuracy / RELATION_DEGREES_METER;
+        String retorno = String.format(Locale.US,"%.8f", degrees);
+        return retorno;
     }
 
 }

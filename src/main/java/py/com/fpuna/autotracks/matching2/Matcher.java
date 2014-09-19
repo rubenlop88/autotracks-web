@@ -45,6 +45,7 @@ public class Matcher {
             p.setLatitude(l.getLatitud());
             p.setLongitude(l.getLongitud());
             p.setTime(l.getFecha().getTime());
+            p.setAccuracy(l.getExactitud());
             points.add(p);
         }
         return points;
