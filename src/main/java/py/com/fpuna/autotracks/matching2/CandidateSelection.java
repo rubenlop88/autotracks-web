@@ -62,7 +62,7 @@ public class CandidateSelection {
         double lat = point.getLatitude();
         String geom = "ST_GeomFromText('SRID=4326;POINT(" + lon + " " + lat + ")')";
         String radius;
-        if (point.getAccuracy() != null && point.getAccuracy() > Float.valueOf("0")) {
+        if (point.getAccuracy() != null && point.getAccuracy() > Float.valueOf("1")) {
             radius = getAcuracyInDegrees(point.getAccuracy() * Float.valueOf("1.2"));
         } else {
             radius = String.valueOf(DIST);
