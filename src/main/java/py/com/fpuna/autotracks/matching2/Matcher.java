@@ -9,6 +9,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import py.com.fpuna.autotracks.matching.LocationUtils;
 import py.com.fpuna.autotracks.matching2.model.Candidate;
 import py.com.fpuna.autotracks.matching2.model.Point;
 import py.com.fpuna.autotracks.model.Localizacion;
@@ -34,6 +35,18 @@ public class Matcher {
             l.setLongitudMatch(c.getLongitude());
             l.setMatched(Boolean.TRUE);
             l.setWayId(c.getEdge().getId());
+            if (l.getVelocidad() == 0) {
+                if (i > 0) {
+                    Localizacion a = localizaciones.get(i-1);
+                    float distance = LocationUtils.distance(l.getLatitudMatch(), l.getLongitudMatch(),
+                            a.getLatitudMatch(), a.getLongitudMatch());
+                    long time = (l.getFecha().getTime() - a.getFecha().getTime()) / 1000;
+                    float speed = distance / time;
+                    if (speed < 20 && time < 5 * 60) {
+                        l.setVelocidad(speed);
+                    }
+                }
+            }
             em.merge(l);
         }
     }
