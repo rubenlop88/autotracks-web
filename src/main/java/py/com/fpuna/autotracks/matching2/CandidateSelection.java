@@ -12,9 +12,10 @@ import py.com.fpuna.autotracks.matching2.model.Edge;
 import py.com.fpuna.autotracks.matching2.model.Vertex;
 
 public class CandidateSelection {
-
-    private static final double DIST = 0.0005;
+    private static final double MIN_DIST = 50;
+    private static final double MAX_DIST = 200;
     private static final double RELATION_DEGREES_METER = 111159.0;
+    private static final double ACCURACY_MULTIPLIER = 1.2;
 
     private static final String SQL = " SELECT "
             + " id, "
@@ -62,10 +63,11 @@ public class CandidateSelection {
         double lat = point.getLatitude();
         String geom = "ST_GeomFromText('SRID=4326;POINT(" + lon + " " + lat + ")')";
         String radius;
-        if (point.getAccuracy() != null && point.getAccuracy() > Float.valueOf("1")) {
-            radius = getAcuracyInDegrees(point.getAccuracy() * Float.valueOf("1.2"));
+        if (point.getAccuracy() != null && point.getAccuracy() > Double.valueOf(MIN_DIST)
+                && point.getAccuracy() < Double.valueOf(MAX_DIST)) {
+            radius = getAcuracyInDegrees(point.getAccuracy() * ACCURACY_MULTIPLIER);
         } else {
-            radius = String.valueOf(DIST);
+            radius = getAcuracyInDegrees(MIN_DIST);
         }
         String sql = SQL.replace(":geom", geom).replace(":dist", radius);
         List<?> result = em.createNativeQuery(sql).getResultList();
@@ -104,7 +106,7 @@ public class CandidateSelection {
         return candidateSet;
     }
     
-    private String getAcuracyInDegrees(Float accuracy) {
+    private String getAcuracyInDegrees(Double accuracy) {
         double degrees = accuracy / RELATION_DEGREES_METER;
         String retorno = String.format(Locale.US,"%.8f", degrees);
         return retorno;
