@@ -42,7 +42,7 @@ public class Matcher {
                             a.getLatitudMatch(), a.getLongitudMatch());
                     long time = (l.getFecha().getTime() - a.getFecha().getTime()) / 1000;
                     float speed = distance / time;
-                    if (speed < 20 && time < 5 * 60) {
+                    if (speed < 80 && time < 5 * 60) {
                         l.setVelocidad(speed);
                     }
                 }

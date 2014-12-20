@@ -35,8 +35,13 @@ public class SpatialTemporalMatching {
      * @return
      */
     public List<Candidate> match(List<Point> trayectory) {
-        List<CandidateSet> graph = getCandidateSet(trayectory);
-        List<Candidate> path = findMatchedSequence(graph);
+        List<Candidate> path = new ArrayList<>();
+        try {
+            List<CandidateSet> graph = getCandidateSet(trayectory);
+            path = findMatchedSequence(graph);       
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error al realizar el map matching", e);
+        }
         return path;
     }
 
@@ -109,14 +114,14 @@ public class SpatialTemporalMatching {
                 for (Candidate c2 : currentSet.getCandidates()) {
                     double max = Double.MIN_VALUE;
                     for (Candidate c1 : previousSet.getCandidates()) {
-                        if (!getShortestPath(c1, c2).isEmpty()) {
+//                        if (!getShortestPath(c1, c2).isEmpty()) {
                             double alt = c1.getF() + F(c1, p1, c2, p2);
                             if (alt > max) {
                                 max = alt;
                                 c2.setPre(c1);
                             }
                             c2.setF(max);
-                        }
+//                        }
                     }
                     if (c2.getPre() == null) {
                         int j = currentSet.getCandidates().indexOf(c2);
@@ -216,8 +221,12 @@ public class SpatialTemporalMatching {
     private double shortestPathLength(Candidate c1, Candidate c2) {
         double length = 0;
         List<Result> edges = getShortestPath(c1, c2);
-        for (Result edge : edges) {
-            length += edge.getLength();
+        if (edges.isEmpty()) {
+            length = c1.distanceTo(c2);
+        } else {
+            for (Result edge : edges) {
+                length += edge.getLength();
+            }
         }
         return length;
     }
