@@ -43,7 +43,9 @@ public class RutasService {
 
     public Ruta guardarRuta(Ruta ruta) {
         ruta = em.merge(ruta);
-        matcher.match(ruta.getLocalizaciones());
+        if (ruta.getLocalizaciones() != null && !ruta.getLocalizaciones().isEmpty()) {
+            matcher.match(ruta.getLocalizaciones());
+        }
         return ruta;
     }
 
